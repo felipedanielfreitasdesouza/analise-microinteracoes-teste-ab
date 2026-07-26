@@ -1,16 +1,14 @@
-# React + Vite
+# 📊 Protótipo de Teste A/B — Impacto das Microinterações na UX (TCC)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositório contém a implementação prática do Trabalho de Conclusão de Curso (TCC) desenvolvido por mim e pelo Lucas. O objetivo principal da pesquisa é analisar e mensurar o impacto psicológico e comportamental das **microinterações** na experiência do usuário (UX).
 
-Currently, two official plugins are available:
+## 🚀 Sobre o Projeto
+Para validar a nossa tese, construímos um ambiente controlado de teste A/B composto por dois artefatos independentes:
+* **Protótipo A (Grupo Controle):** Uma interface estática com fluxos e feedbacks assíncronos tradicionais.
+* **Protótipo B (Grupo Experimental):** A mesma interface, porém enriquecida com microinterações dinâmicas, transições fluidas e feedbacks visuais instantâneos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Stack Tecnológica
+* **Frontend:** React.js (gerenciamento de estado e componentização)
+* **Estilização:** Tailwind CSS v4 (estilização utilitária de alta performance)
+* **Roteamento:** React Router Dom (separação das rotas `/a` e `/b`)
+* **Métricas e Analytics:** Umami API (rastreamento quantitativo de eventos e cliques) e Hotjar (análise qualitativa via mapas de calor e gravações de sessão)
