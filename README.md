@@ -11,4 +11,5 @@ Para validar a nossa tese, construímos um ambiente controlado de teste A/B comp
 * **Frontend:** React.js (gerenciamento de estado e componentização)
 * **Estilização:** Tailwind CSS v4 (estilização utilitária de alta performance)
 * **Roteamento:** React Router Dom (separação das rotas `/a` e `/b`)
+* **Ambiente e Build:** Vite (servidor de desenvolvimento rápido e empacotador otimizado de arquivos)
 * **Métricas e Analytics:** Umami API (rastreamento quantitativo de eventos e cliques) e Hotjar (análise qualitativa via mapas de calor e gravações de sessão)
