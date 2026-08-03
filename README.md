@@ -57,6 +57,8 @@ src/
 ├── store/        # Estados globais controlados pelo Zustand (useCarrinho)
 └── App.jsx       # Roteamento e provedores globais (QueryClientProvider)
 
+```
+
 ## ⚙️ Pré-requisitos do Ambiente
 
 Antes de iniciar a instalação do projeto, o seu computador precisa ter duas ferramentas fundamentais configuradas para desenvolvimento web moderno:
