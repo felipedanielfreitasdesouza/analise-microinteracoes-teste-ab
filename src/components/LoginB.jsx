@@ -28,11 +28,13 @@ export default function LoginB({ aoLogar, darkTheme }) {
       >
         <div className="text-center mb-8">
           <h2 className="text-2xl font-black bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent tracking-wide">
-            Bem-vindo de Volta
+            Autenticação do Sistema (B)
           </h2>
+          {/*
           <p className={`text-xs mt-2 ${darkTheme ? 'text-slate-450' : 'text-slate-500'}`}>
             Experimente a fluidez no preenchimento de dados
           </p>
+          */}
         </div>
 
         <AnimatePresence mode="whiteout">
@@ -77,7 +79,7 @@ export default function LoginB({ aoLogar, darkTheme }) {
               required
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
-              placeholder="Sua senha secreta"
+              placeholder="Sua senha de Acesso"
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all duration-300 focus:outline-none border ${
                 darkTheme 
                   ? 'bg-slate-950 border-slate-800 text-slate-200 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 placeholder-slate-600'
