@@ -21,8 +21,8 @@ export const useAuth = create((set) => ({
     }
   },
 
-  // Simulação de Cadastro
-  cadastrar: async (nome, email, senha) => {
+  // Simulação de Cadastro não utilizado
+  cadastrar: async (nome, email) => {
     set({ estaCarregando: true, erro: null });
     await new Promise((resolve) => setTimeout(resolve, 1550));
     

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../store/useAuth';
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { trackExperimentEvent } from '../services/analytics';
 
 export default function LoginB({ aoLogar, darkTheme }) {
   const [email, setEmail] = useState('');
@@ -10,8 +11,14 @@ export default function LoginB({ aoLogar, darkTheme }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    trackExperimentEvent('login_submitted', 'B');
     const sucesso = await login(email, senha);
-    if (sucesso) aoLogar();
+
+    trackExperimentEvent(sucesso ? 'login_succeeded' : 'login_failed', 'B');
+
+    if (sucesso) {
+      aoLogar();
+    }
   };
 
   return (
@@ -62,6 +69,7 @@ export default function LoginB({ aoLogar, darkTheme }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Seu endereço de e-mail"
+              data-cs-mask
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all duration-300 focus:outline-none border ${
                 darkTheme 
                   ? 'bg-slate-950 border-slate-800 text-slate-200 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 placeholder-slate-600'
@@ -80,6 +88,7 @@ export default function LoginB({ aoLogar, darkTheme }) {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="Sua senha de Acesso"
+              data-cs-mask
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all duration-300 focus:outline-none border ${
                 darkTheme 
                   ? 'bg-slate-950 border-slate-800 text-slate-200 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 placeholder-slate-600'

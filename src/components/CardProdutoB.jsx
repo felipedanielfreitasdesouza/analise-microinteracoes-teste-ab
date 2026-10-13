@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Eye, Check } from 'lucide-react';
+import { trackExperimentEvent } from '../services/analytics';
 
 export default function CardProdutoB({ produto, isDark, isClicado, onAdicionar, onVisualizar }) {
   return (
@@ -27,7 +28,13 @@ export default function CardProdutoB({ produto, isDark, isClicado, onAdicionar, 
         <motion.button 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => onVisualizar(produto)}
+          onClick={() => {
+            trackExperimentEvent('product_details_opened', 'B', {
+              product_id: produto.id,
+              category: produto.category,
+            });
+            onVisualizar(produto);
+          }}
           className={`absolute top-3 right-3 p-2 rounded-xl border transition-all cursor-pointer ${
             isDark 
               ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-emerald-400' 
@@ -68,7 +75,13 @@ export default function CardProdutoB({ produto, isDark, isClicado, onAdicionar, 
             layout
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onAdicionar(produto)}
+            onClick={() => {
+              trackExperimentEvent('product_added_to_cart', 'B', {
+                product_id: produto.id,
+                category: produto.category,
+              });
+              onAdicionar(produto);
+            }}
             className={`text-xs font-black py-2 px-4 rounded-xl cursor-pointer flex items-center gap-1.5 transition-all duration-300 ${
               isClicado 
                 ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20' 

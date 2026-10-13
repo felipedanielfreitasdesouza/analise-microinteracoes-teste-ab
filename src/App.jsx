@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PrototipoA from './pages/PrototipoA';
 import PrototipoB from './pages/PrototipoB';
+import { trackContentsquareStateChange, trackExperimentEvent } from './services/analytics';
 
 // Cria o cliente que vai gerenciar o cache das nossas requisições
 const queryClient = new QueryClient({
@@ -13,14 +15,34 @@ const queryClient = new QueryClient({
   },
 });
 
+function AnalyticsRouteTracker() {
+  const location = useLocation();
+  const previousPath = useRef(null);
+
+  useEffect(() => {
+    const prototype = location.pathname === '/b' ? 'B' : location.pathname === '/a' ? 'A' : 'unknown';
+
+    trackExperimentEvent('prototype_view', prototype, { path: location.pathname });
+
+    if (previousPath.current !== null && previousPath.current !== location.pathname) {
+      trackContentsquareStateChange(location.pathname);
+    }
+
+    previousPath.current = location.pathname;
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <AnalyticsRouteTracker />
         <Routes>
+          <Route path="*" element={<Navigate to="/a" replace />} />
           <Route path="/a" element={<PrototipoA />} />
           <Route path="/b" element={<PrototipoB />} />
-          <Route path="*" element={<Navigate to="/a" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
