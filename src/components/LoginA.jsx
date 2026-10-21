@@ -23,7 +23,7 @@ export default function LoginA({ aoLogar }) {
     <div className="min-h-screen bg-slate-200 flex items-center justify-center p-4 font-sans">
       <div className="bg-white border-2 border-slate-400 p-8 w-full max-w-md rounded-none shadow-none">
         <h2 className="text-xl font-black text-slate-900 border-b-2 border-slate-900 pb-2 mb-6 uppercase tracking-tight">
-          Autenticação do Sistema (A)
+          Autenticação do Sistema
         </h2>
 
         {erro && (

@@ -131,7 +131,7 @@ Para que o usuário ou a banca examinadora consiga vivenciar os fluxos idêntico
 ### Rotas de Avaliação
 
 * **Ambiente A (Controle Rígido):** Acesse a rota `http://localhost:5173/a` para interagir com o sistema sem respostas fluidas de animação.
-* **Ambiente B (Experimental Dinâmico):** Acesse a rota `http://localhost:5173/b` para testar os estados complexos de microinterações e o alternador de temas visuais no cabeçalho superior.
+* **Ambiente B (Experimental Dinâmico):** Acesse a rota `http://localhost:5173/b` para testar os estados de microinteração, como o carregamento com skeleton, as transições do carrinho e do modal e o feedback visual após adicionar um produto.
 
 ---
 

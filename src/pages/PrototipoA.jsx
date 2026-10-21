@@ -65,7 +65,7 @@ export default function PrototipoA() {
       <header className="bg-slate-800 border-b-2 border-slate-900 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-base font-black tracking-normal text-slate-100">SISTEMA CATÁLOGO (A)</h1>
+            <h1 className="text-base font-black tracking-normal text-slate-100">SISTEMA CATÁLOGO</h1>
             <span className="text-[11px] font-mono bg-slate-700 px-2 py-0.5 text-slate-300">
               User: {usuario.nome}
             </span>
@@ -215,7 +215,7 @@ export default function PrototipoA() {
               <button 
                 onClick={() => {
                   trackExperimentEvent('checkout_attempted', 'A', { cart_items: itens.length });
-                  alert('Fluxo concluído no módulo A.');
+                  alert('Fluxo concluído.');
                 }}
                 className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded-none text-xs cursor-pointer"
                 disabled={itens.length === 0}
