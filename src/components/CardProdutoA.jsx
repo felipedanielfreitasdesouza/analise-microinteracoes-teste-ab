@@ -1,4 +1,5 @@
 import { Eye } from 'lucide-react';
+import { trackExperimentEvent } from '../services/analytics';
 
 export default function CardProdutoA({ produto, onAdicionar, onVisualizar }) {
   return (
@@ -7,7 +8,13 @@ export default function CardProdutoA({ produto, onAdicionar, onVisualizar }) {
       <div className="relative bg-slate-50 h-48 flex items-center justify-center p-4 border-b border-slate-200">
         <img src={produto.thumbnail} alt={produto.title} className="max-h-full object-contain" />
         <button 
-          onClick={() => onVisualizar(produto)}
+          onClick={() => {
+            trackExperimentEvent('product_details_opened', 'A', {
+              product_id: produto.id,
+              category: produto.category,
+            });
+            onVisualizar(produto);
+          }}
           className="absolute top-2 right-2 bg-white p-1.5 border border-slate-300 rounded-none text-slate-700 hover:bg-slate-100 cursor-pointer shadow-none"
           title="Visualizar Detalhes"
         >
@@ -24,7 +31,13 @@ export default function CardProdutoA({ produto, onAdicionar, onVisualizar }) {
         <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
           <span className="text-base font-bold text-slate-950">${produto.price.toFixed(2)}</span>
           <button 
-            onClick={() => onAdicionar(produto)}
+            onClick={() => {
+              trackExperimentEvent('product_added_to_cart', 'A', {
+                product_id: produto.id,
+                category: produto.category,
+              });
+              onAdicionar(produto);
+            }}
             className="bg-slate-700 hover:bg-slate-800 text-white font-medium text-xs py-2 px-4 rounded-none cursor-pointer transition-none"
           >
             Adicionar

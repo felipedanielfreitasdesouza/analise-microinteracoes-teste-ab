@@ -6,6 +6,7 @@ import { useAuth } from '../store/useAuth';
 import CardProdutoA from '../components/CardProdutoA';
 import LoginA from '../components/LoginA';
 import { ShoppingCart, Search, X, Plus, Minus, Trash2, LogOut } from 'lucide-react';
+import { trackExperimentEvent } from '../services/analytics';
 
 export default function PrototipoA() {
   const [busca, setBusca] = useState('');
@@ -64,7 +65,7 @@ export default function PrototipoA() {
       <header className="bg-slate-800 border-b-2 border-slate-900 text-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-base font-black tracking-normal text-slate-100">SISTEMA CATÁLOGO (A)</h1>
+            <h1 className="text-base font-black tracking-normal text-slate-100">SISTEMA CATÁLOGO</h1>
             <span className="text-[11px] font-mono bg-slate-700 px-2 py-0.5 text-slate-300">
               User: {usuario.nome}
             </span>
@@ -85,7 +86,10 @@ export default function PrototipoA() {
           <div className="flex items-center gap-2">
             {/* BOTAO CARRINHO SEM ANIMAÇÃO */}
             <button 
-              onClick={() => setCarrinhoAberto(true)}
+              onClick={() => {
+                trackExperimentEvent('cart_opened', 'A');
+                setCarrinhoAberto(true);
+              }}
               className="bg-slate-700 text-white px-4 py-2 rounded-none border border-slate-600 flex items-center gap-2 cursor-pointer text-xs font-bold hover:bg-slate-600"
             >
               <ShoppingCart className="h-4 w-4" />
@@ -95,6 +99,7 @@ export default function PrototipoA() {
             {/* BOTÃO LOGOUT RÍGIDO */}
             <button 
               onClick={() => {
+                trackExperimentEvent('logout', 'A');
                 limparCarrinho();
                 logout();
               }}
@@ -117,7 +122,10 @@ export default function PrototipoA() {
             {categorias.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setCategoriaFiltrada(cat)}
+                onClick={() => {
+                  trackExperimentEvent('category_filter_applied', 'A', { category: cat });
+                  setCategoriaFiltrada(cat);
+                }}
                 className={`text-left px-3 py-2 text-xs rounded-none border border-slate-300 capitalize cursor-pointer w-full transition-none ${
                   categoriaFiltrada === cat 
                     ? 'bg-blue-800 text-white font-bold border-blue-900' 
@@ -205,7 +213,10 @@ export default function PrototipoA() {
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <button 
-                onClick={() => alert('Fluxo concluído no módulo A.')}
+                onClick={() => {
+                  trackExperimentEvent('checkout_attempted', 'A', { cart_items: itens.length });
+                  alert('Fluxo concluído.');
+                }}
                 className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded-none text-xs cursor-pointer"
                 disabled={itens.length === 0}
               >
@@ -243,6 +254,10 @@ export default function PrototipoA() {
                 <span className="text-xl font-black text-slate-950">${produtoModal.price.toFixed(2)}</span>
                 <button 
                   onClick={() => {
+                    trackExperimentEvent('product_added_to_cart', 'A', {
+                      product_id: produtoModal.id,
+                      category: produtoModal.category,
+                    });
                     adicionarProduto(produtoModal);
                     setProdutoModal(null);
                   }}
