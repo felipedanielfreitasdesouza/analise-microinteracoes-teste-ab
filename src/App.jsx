@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PrototipoA from './pages/PrototipoA';
 import PrototipoB from './pages/PrototipoB';
-import { trackContentsquareStateChange, trackExperimentEvent } from './services/analytics';
+import { trackClarityTag, trackExperimentEvent } from './services/analytics';
 
 // Cria o cliente que vai gerenciar o cache das nossas requisições
 const queryClient = new QueryClient({
@@ -30,10 +30,7 @@ function AnalyticsRouteTracker() {
     }
 
     trackExperimentEvent('prototype_view', prototype, { path: location.pathname });
-
-    if (previousPath !== null) {
-      trackContentsquareStateChange(location.pathname);
-    }
+    trackClarityTag('prototype', prototype);
 
     lastTrackedPath.current = location.pathname;
   }, [location.pathname]);

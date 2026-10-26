@@ -1,8 +1,55 @@
 const umamiScriptUrl = import.meta.env.VITE_UMAMI_SCRIPT_URL?.trim();
 const umamiWebsiteId = import.meta.env.VITE_UMAMI_WEBSITE_ID?.trim();
-const contentsquareTagId = import.meta.env.VITE_CONTENTSQUARE_TAG_ID?.trim();
+const clarityProjectId = import.meta.env.VITE_CLARITY_PROJECT_ID?.trim();
 
 const pendingUmamiEvents = [];
+const taskStartStorageKey = 'tcc-microinteracoes-task-starts';
+
+function getStudySessionId() {
+  if (typeof window === 'undefined') {
+    return 'server-session';
+  }
+
+  const storageKey = 'tcc-microinteracoes-session-id';
+
+  try {
+    const existingSessionId = window.sessionStorage.getItem(storageKey);
+
+    if (existingSessionId) {
+      return existingSessionId;
+    }
+
+    const newSessionId = `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    window.sessionStorage.setItem(storageKey, newSessionId);
+    return newSessionId;
+  } catch {
+    return 'session-unavailable';
+  }
+}
+
+function readTaskStarts() {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    return JSON.parse(window.sessionStorage.getItem(taskStartStorageKey) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function writeTaskStarts(taskStarts) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(taskStartStorageKey, JSON.stringify(taskStarts));
+  } catch {
+    // O rastreamento não deve impedir o uso do protótipo se o armazenamento estiver indisponível.
+  }
+}
 
 function flushPendingUmamiEvents() {
   if (typeof window === 'undefined' || typeof window.umami?.track !== 'function') {
@@ -35,22 +82,20 @@ function initializeUmami() {
   addScript(script);
 }
 
-function contentsquarePath(path = window.location.pathname) {
-  return `${path}${window.location.hash.replace('#', '?__')}`;
-}
-
-function initializeContentsquare() {
-  if (!contentsquareTagId || typeof window === 'undefined' || document.querySelector('[data-tcc-analytics="contentsquare"]')) {
+function initializeClarity() {
+  if (!clarityProjectId || typeof window === 'undefined' || document.querySelector('[data-tcc-analytics="clarity"]')) {
     return;
   }
 
-  window._uxa = window._uxa || [];
-  window._uxa.push(['setPath', contentsquarePath()]);
+  window.clarity = window.clarity || function clarityQueue(...args) {
+    window.clarity.q = window.clarity.q || [];
+    window.clarity.q.push(args);
+  };
 
   const script = document.createElement('script');
   script.async = true;
-  script.src = `https://t.contentsquare.net/uxa/${contentsquareTagId}.js`;
-  script.dataset.tccAnalytics = 'contentsquare';
+  script.src = `https://www.clarity.ms/tag/${clarityProjectId}`;
+  script.dataset.tccAnalytics = 'clarity';
 
   addScript(script);
 }
@@ -61,7 +106,7 @@ export function initializeAnalytics() {
   }
 
   initializeUmami();
-  initializeContentsquare();
+  initializeClarity();
 }
 
 export function trackUmamiEvent(name, data = {}) {
@@ -77,25 +122,66 @@ export function trackUmamiEvent(name, data = {}) {
   window.umami.track(name, data);
 }
 
-export function trackContentsquareEvent(name) {
-  if (typeof window !== 'undefined' && contentsquareTagId) {
-    window._uxa = window._uxa || [];
-    window._uxa.push(['trackPageEvent', name]);
+export function trackClarityTag(key, value) {
+  if (typeof window !== 'undefined' && clarityProjectId && typeof window.clarity === 'function') {
+    window.clarity('set', key, value);
   }
 }
 
 export function trackExperimentEvent(name, prototype, data = {}) {
-  const eventData = { prototype, ...data };
-  const contentsquareEventName = `${name}_${prototype.toLowerCase()}`;
+  const eventData = {
+    prototype,
+    session_id: getStudySessionId(),
+    occurred_at: new Date().toISOString(),
+    ...data,
+  };
 
   trackUmamiEvent(name, eventData);
-  trackContentsquareEvent(contentsquareEventName);
 }
 
-export function trackContentsquareStateChange(path) {
-  if (typeof window !== 'undefined' && contentsquareTagId) {
-    window._uxa = window._uxa || [];
-    window._uxa.push(['setPath', contentsquarePath(path)]);
-    window._uxa.push(['trackPageview']);
+export function trackTaskStarted(taskId, prototype, data = {}) {
+  const taskStarts = readTaskStarts();
+  const taskKey = `${prototype}:${taskId}`;
+
+  if (taskStarts[taskKey]) {
+    return;
   }
+
+  const startedAt = Date.now();
+  taskStarts[taskKey] = startedAt;
+  writeTaskStarts(taskStarts);
+
+  trackExperimentEvent('task_started', prototype, {
+    task_id: taskId,
+    started_at: new Date(startedAt).toISOString(),
+    ...data,
+  });
+}
+
+export function trackTaskCompleted(taskId, prototype, data = {}) {
+  const taskStarts = readTaskStarts();
+  const taskKey = `${prototype}:${taskId}`;
+  const startedAt = taskStarts[taskKey];
+  const completedAt = Date.now();
+  const durationMs = startedAt ? Math.max(0, completedAt - startedAt) : null;
+
+  if (startedAt) {
+    delete taskStarts[taskKey];
+    writeTaskStarts(taskStarts);
+  }
+
+  trackExperimentEvent('task_completed', prototype, {
+    task_id: taskId,
+    completed_at: new Date(completedAt).toISOString(),
+    duration_ms: durationMs,
+    duration_seconds: durationMs === null ? null : Number((durationMs / 1000).toFixed(2)),
+    ...data,
+  });
+}
+
+export function trackTaskError(taskId, prototype, data = {}) {
+  trackExperimentEvent('task_error', prototype, {
+    task_id: taskId,
+    ...data,
+  });
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { buscarProdutos } from '../services/api';
 import { useCarrinho } from '../store/useCarrinho';
@@ -6,7 +6,7 @@ import { useAuth } from '../store/useAuth';
 import CardProdutoA from '../components/CardProdutoA';
 import LoginA from '../components/LoginA';
 import { ShoppingCart, Search, X, Plus, Minus, Trash2, LogOut } from 'lucide-react';
-import { trackExperimentEvent } from '../services/analytics';
+import { trackExperimentEvent, trackTaskCompleted, trackTaskStarted } from '../services/analytics';
 
 export default function PrototipoA() {
   const [busca, setBusca] = useState('');
@@ -23,6 +23,21 @@ export default function PrototipoA() {
   });
 
   const { itens, adicionarProduto, removerProduto, atualizarQuantidade, limparCarrinho } = useCarrinho();
+
+  useEffect(() => {
+    if (usuario && produtos?.length) {
+      trackTaskStarted('add_product', 'A');
+    }
+  }, [usuario, produtos]);
+
+  const registrarProdutoAdicionado = (produto) => {
+    trackTaskCompleted('add_product', 'A', {
+      product_id: produto.id,
+      category: produto.category,
+    });
+    trackTaskStarted('checkout', 'A', { product_id: produto.id });
+    adicionarProduto(produto);
+  };
 
   // Bloqueio de segurança: Se não estiver logado, renderiza apenas a tela de Login estática
   if (!usuario) {
@@ -145,7 +160,7 @@ export default function PrototipoA() {
               <CardProdutoA 
                 key={produto.id} 
                 produto={produto} 
-                onAdicionar={adicionarProduto} 
+                onAdicionar={registrarProdutoAdicionado}
                 onVisualizar={setProdutoModal} 
               />
             ))}
@@ -215,6 +230,8 @@ export default function PrototipoA() {
               <button 
                 onClick={() => {
                   trackExperimentEvent('checkout_attempted', 'A', { cart_items: itens.length });
+                  trackExperimentEvent('checkout_completed', 'A', { cart_items: itens.length });
+                  trackTaskCompleted('checkout', 'A', { cart_items: itens.length });
                   alert('Fluxo concluído.');
                 }}
                 className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded-none text-xs cursor-pointer"
@@ -258,7 +275,7 @@ export default function PrototipoA() {
                       product_id: produtoModal.id,
                       category: produtoModal.category,
                     });
-                    adicionarProduto(produtoModal);
+                    registrarProdutoAdicionado(produtoModal);
                     setProdutoModal(null);
                   }}
                   className="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-none text-xs cursor-pointer"

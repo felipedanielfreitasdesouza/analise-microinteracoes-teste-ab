@@ -135,24 +135,24 @@ Para que o usuário ou a banca examinadora consiga vivenciar os fluxos idêntico
 
 ---
 
-## 📈 Configuração de Analytics (Umami + Contentsquare)
+## 📈 Configuração de Analytics (Umami + Microsoft Clarity)
 
 O projeto usa duas ferramentas com funções diferentes:
 
 * **Umami:** coleta quantitativa de páginas visitadas e eventos da interação, como login, abertura do carrinho, filtros, adição de produtos e tentativa de checkout.
-* **Contentsquare (antigo Hotjar):** coleta qualitativa por meio de mapas de calor, gravações de sessão e eventos para filtrar as sessões dos Protótipos A e B.
+* **Microsoft Clarity:** coleta qualitativa por meio de mapas de calor, gravações de sessão e tags para filtrar as sessões dos Protótipos A e B.
 
 ### Configuração local
 
 1. Copie `.env.example` para `.env`.
 2. No Umami, crie ou abra o website do experimento e copie o `Website ID` e a URL do `script.js`.
-3. No Contentsquare, crie ou abra o projeto do experimento e copie o `Tag ID` em `Projects and users > Tracking`.
+3. No Microsoft Clarity, crie ou abra o projeto do experimento e copie o `Project ID` em `Settings > Setup`.
 4. Preencha os valores no arquivo `.env`:
 
 ```env
 VITE_UMAMI_SCRIPT_URL=https://cloud.umami.is/script.js
 VITE_UMAMI_WEBSITE_ID=seu-website-id
-VITE_CONTENTSQUARE_TAG_ID=seu-contentsquare-tag-id
+VITE_CLARITY_PROJECT_ID=seu-clarity-project-id
 ```
 
 5. Reinicie o Vite depois de alterar o `.env`:
@@ -163,6 +163,6 @@ npm run dev
 
 Os identificadores ficam no frontend porque são identificadores públicos de instalação, não chaves secretas. Não coloque senhas, tokens privados ou dados pessoais nas variáveis `VITE_*`.
 
-Os eventos enviados carregam a variante experimental (`A` ou `B`) para permitir a comparação entre os protótipos. Credenciais digitadas não são enviadas; os campos de autenticação também estão marcados com `data-cs-mask` para supressão nas gravações do Contentsquare.
+Os eventos enviados ao Umami carregam a variante experimental (`A` ou `B`) para permitir a comparação entre os protótipos. Credenciais digitadas não são enviadas; os campos de autenticação também estão marcados com `data-clarity-mask` para supressão nas gravações do Microsoft Clarity.
 
-Referências oficiais: [eventos no Umami](https://docs.umami.is/docs/track-events), [Umami em aplicações React/Vite](https://docs.umami.is/docs/guides/track-single-page-apps), [instalação do tag do Contentsquare](https://support.contentsquare.com/hc/en-us/articles/37271848593297-How-do-I-install-the-Contentsquare-tag) e [supressão de dados pessoais](https://support.contentsquare.com/hc/en-us/articles/37271680419345-How-to-suppress-collected-data).
+Referências oficiais: [eventos no Umami](https://docs.umami.is/docs/track-events), [Umami em aplicações React/Vite](https://docs.umami.is/docs/guides/track-single-page-apps), [instalação do Microsoft Clarity](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-setup), [tags personalizadas do Clarity](https://learn.microsoft.com/en-us/clarity/filters/custom-tags) e [mascaramento de dados](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-masking).
