@@ -1,13 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../store/useAuth';
 import { Loader2 } from 'lucide-react';
-import { trackExperimentEvent } from '../services/analytics';
+import { trackExperimentEvent, trackTaskCompleted, trackTaskError, trackTaskStarted } from '../services/analytics';
 
 export default function LoginB({ aoLogar }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const { login, estaCarregando, erro } = useAuth();
+
+  useEffect(() => {
+    trackTaskStarted('login', 'B');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +19,11 @@ export default function LoginB({ aoLogar }) {
     const sucesso = await login(email, senha);
 
     trackExperimentEvent(sucesso ? 'login_succeeded' : 'login_failed', 'B');
+    if (sucesso) {
+      trackTaskCompleted('login', 'B');
+    } else {
+      trackTaskError('login', 'B', { reason: 'invalid_credentials' });
+    }
 
     if (sucesso) {
       aoLogar();
@@ -57,7 +66,7 @@ export default function LoginB({ aoLogar }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Ex: tcc@teste.com"
-              data-cs-mask
+              data-clarity-mask
               className="w-full p-2 bg-white border border-slate-400 rounded-none text-sm focus:outline-none focus:border-slate-900"
             />
           </div>
@@ -72,7 +81,7 @@ export default function LoginB({ aoLogar }) {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               placeholder="••••••"
-              data-cs-mask
+              data-clarity-mask
               className="w-full p-2 bg-white border border-slate-400 rounded-none text-sm focus:outline-none focus:border-slate-900"
             />
           </div>

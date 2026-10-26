@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import { buscarProdutos } from '../services/api';
@@ -7,7 +7,7 @@ import { useAuth } from '../store/useAuth';
 import { ShoppingCart, Search, X, Plus, Minus, Trash2, LogOut } from 'lucide-react';
 import CardProdutoB from '../components/CardProdutoB';
 import LoginB from '../components/LoginB';
-import { trackExperimentEvent } from '../services/analytics';
+import { trackExperimentEvent, trackTaskCompleted, trackTaskStarted } from '../services/analytics';
 
 export default function PrototipoB() {
   const [busca, setBusca] = useState('');
@@ -24,6 +24,21 @@ export default function PrototipoB() {
   });
 
   const { itens, adicionarProduto, removerProduto, atualizarQuantidade, limparCarrinho } = useCarrinho();
+
+  useEffect(() => {
+    if (usuario && produtos?.length) {
+      trackTaskStarted('add_product', 'B');
+    }
+  }, [usuario, produtos]);
+
+  const registrarProdutoAdicionado = (produto) => {
+    trackTaskCompleted('add_product', 'B', {
+      product_id: produto.id,
+      category: produto.category,
+    });
+    trackTaskStarted('checkout', 'B', { product_id: produto.id });
+    dispararAdicionar(produto);
+  };
 
   if (!usuario) {
     return <LoginB aoLogar={() => console.log('Usuário autenticado no Canal B.')} />;
@@ -171,7 +186,7 @@ export default function PrototipoB() {
                   key={produto.id}
                   produto={produto}
                   isClicado={clicadoId === produto.id}
-                  onAdicionar={dispararAdicionar}
+                  onAdicionar={registrarProdutoAdicionado}
                   onVisualizar={setProdutoModal}
                 />
               ))}
@@ -275,6 +290,8 @@ export default function PrototipoB() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       trackExperimentEvent('checkout_attempted', 'B', { cart_items: itens.length });
+                      trackExperimentEvent('checkout_completed', 'B', { cart_items: itens.length });
+                      trackTaskCompleted('checkout', 'B', { cart_items: itens.length });
                       alert('Fluxo concluído.');
                     }}
                     className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 rounded-none text-xs cursor-pointer"
@@ -339,7 +356,7 @@ export default function PrototipoB() {
                           product_id: produtoModal.id,
                           category: produtoModal.category,
                         });
-                        dispararAdicionar(produtoModal);
+                        registrarProdutoAdicionado(produtoModal);
                         setProdutoModal(null);
                       }}
                       className="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-none text-xs cursor-pointer"
