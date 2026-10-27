@@ -133,6 +133,15 @@ Para que o usuário ou a banca examinadora consiga vivenciar os fluxos idêntico
 * **Ambiente A (Controle Rígido):** Acesse a rota `http://localhost:5173/a` para interagir com o sistema sem respostas fluidas de animação.
 * **Ambiente B (Experimental Dinâmico):** Acesse a rota `http://localhost:5173/b` para testar os estados de microinteração, como o carregamento com skeleton, as transições do carrinho e do modal e o feedback visual após adicionar um produto.
 
+Para identificar anonimamente cada participante, acrescente o código da coleta ao link. Use o mesmo código nas duas versões:
+
+```text
+https://analise-microinteracoes-teste-ab.vercel.app/a?participant=P01
+https://analise-microinteracoes-teste-ab.vercel.app/b?participant=P01
+```
+
+Use códigos como `P01`, `P02` e `P03`; nunca use nomes, e-mails ou outros dados pessoais. O código é enviado como `participant_id` para o Umami e como tag no Clarity. Os dados não devem ser resetados entre participantes: filtre-os pelo participante, protótipo, sessão e período da coleta.
+
 ---
 
 ## 📈 Configuração de Analytics (Umami + Microsoft Clarity)

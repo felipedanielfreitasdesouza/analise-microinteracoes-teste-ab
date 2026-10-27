@@ -4,6 +4,24 @@ const clarityProjectId = import.meta.env.VITE_CLARITY_PROJECT_ID?.trim();
 
 const pendingUmamiEvents = [];
 const taskStartStorageKey = 'tcc-microinteracoes-task-starts';
+const participantIdPattern = /^[A-Z0-9_-]{1,20}$/;
+
+function getParticipantId() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const participantId = new URLSearchParams(window.location.search)
+      .get('participant')
+      ?.trim()
+      .toUpperCase();
+
+    return participantId && participantIdPattern.test(participantId) ? participantId : null;
+  } catch {
+    return null;
+  }
+}
 
 function getStudySessionId() {
   if (typeof window === 'undefined') {
@@ -107,6 +125,11 @@ export function initializeAnalytics() {
 
   initializeUmami();
   initializeClarity();
+
+  const participantId = getParticipantId();
+  if (participantId) {
+    trackClarityTag('participant_id', participantId);
+  }
 }
 
 export function trackUmamiEvent(name, data = {}) {
@@ -129,11 +152,13 @@ export function trackClarityTag(key, value) {
 }
 
 export function trackExperimentEvent(name, prototype, data = {}) {
+  const participantId = getParticipantId();
   const eventData = {
     prototype,
     session_id: getStudySessionId(),
     occurred_at: new Date().toISOString(),
     ...data,
+    ...(participantId ? { participant_id: participantId } : {}),
   };
 
   trackUmamiEvent(name, eventData);
