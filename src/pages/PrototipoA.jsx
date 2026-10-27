@@ -6,7 +6,7 @@ import { useAuth } from '../store/useAuth';
 import CardProdutoA from '../components/CardProdutoA';
 import LoginA from '../components/LoginA';
 import { ShoppingCart, Search, X, Plus, Minus, Trash2, LogOut } from 'lucide-react';
-import { trackExperimentEvent, trackTaskCompleted, trackTaskStarted } from '../services/analytics';
+import { trackActiveTasksAbandoned, trackExperimentEvent, trackTaskCompleted, trackTaskError, trackTaskStarted } from '../services/analytics';
 
 export default function PrototipoA() {
   const [busca, setBusca] = useState('');
@@ -115,6 +115,7 @@ export default function PrototipoA() {
             <button 
               onClick={() => {
                 trackExperimentEvent('logout', 'A');
+                trackActiveTasksAbandoned('A', { reason: 'session_ended_by_user' });
                 limparCarrinho();
                 logout();
               }}
@@ -230,6 +231,12 @@ export default function PrototipoA() {
               <button 
                 onClick={() => {
                   trackExperimentEvent('checkout_attempted', 'A', { cart_items: itens.length });
+
+                  if (itens.length === 0) {
+                    trackTaskError('checkout', 'A', { reason: 'empty_cart' });
+                    return;
+                  }
+
                   trackExperimentEvent('checkout_completed', 'A', { cart_items: itens.length });
                   trackTaskCompleted('checkout', 'A', { cart_items: itens.length });
                   alert('Fluxo concluído.');

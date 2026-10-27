@@ -185,3 +185,35 @@ export function trackTaskError(taskId, prototype, data = {}) {
     ...data,
   });
 }
+
+export function trackTaskAbandoned(taskId, prototype, data = {}) {
+  const taskStarts = readTaskStarts();
+  const taskKey = `${prototype}:${taskId}`;
+  const startedAt = taskStarts[taskKey];
+  const abandonedAt = Date.now();
+  const durationMs = startedAt ? Math.max(0, abandonedAt - startedAt) : null;
+
+  if (startedAt) {
+    delete taskStarts[taskKey];
+    writeTaskStarts(taskStarts);
+  }
+
+  trackExperimentEvent('task_abandoned', prototype, {
+    task_id: taskId,
+    abandoned_at: new Date(abandonedAt).toISOString(),
+    duration_ms: durationMs,
+    duration_seconds: durationMs === null ? null : Number((durationMs / 1000).toFixed(2)),
+    ...data,
+  });
+}
+
+export function trackActiveTasksAbandoned(prototype, data = {}) {
+  const taskPrefix = `${prototype}:`;
+  const activeTaskIds = Object.keys(readTaskStarts())
+    .filter((taskKey) => taskKey.startsWith(taskPrefix))
+    .map((taskKey) => taskKey.slice(taskPrefix.length));
+
+  activeTaskIds.forEach((taskId) => {
+    trackTaskAbandoned(taskId, prototype, data);
+  });
+}
